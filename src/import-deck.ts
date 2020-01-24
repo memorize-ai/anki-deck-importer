@@ -9,12 +9,18 @@ import { Database } from 'sqlite3'
 import sqlite3 from './sqlite3'
 
 import { matchAll } from './helpers'
-import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX } from './constants'
+import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE } from './constants'
 
 type AssetMap = Record<string, string>
 
 const topics: Record<string, string[]> = require(TOPICS_PATH)
 const assetPathCache: Record<string, string> = {}
+const assets: {
+	path: string
+	destination: string
+	contentType: string
+	token: string
+}[] = []
 
 export default async (deckId: string, topicIds: string[]) => {
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
@@ -34,16 +40,18 @@ export default async (deckId: string, topicIds: string[]) => {
 			await importDeck(db, deckId, topicIds)
 			
 			console.log('Imported deck data')
-			console.log('Importing cards...')
 			
 			await importCards(db, deckId, path, assetMapForPath(path))
-			
-			console.log('Imported cards')
 			
 			resolve()
 		})
 	)
 	
+	console.log(`Uploading ${assets.length} assets...`)
+	
+	await uploadAssets()
+	
+	console.log(`Uploaded ${assets.length} assets`)
 	console.log('Deleting deck path...')
 	
 	await deleteDeck(path)
@@ -136,20 +144,18 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 							const model = models[note.mid]
 							const { qfmt, afmt } = model.tmpls[card.ord]
 							
-							const sides = await getCardSides(deckId, {
-								path,
-								assetMap,
-								fieldNames: model.flds
-									.sort(({ ord: a }: any, { ord: b }: any) => a - b)
-									.map(({ name }: any) => name),
-								fieldValues: note.flds.split('\u001f'),
-								frontTemplate: qfmt,
-								backTemplate: afmt
-							})
-							
 							cards.push({
 								section: '',
-								...sides,
+								...getCardSides(deckId, {
+									path,
+									assetMap,
+									fieldNames: model.flds
+										.sort(({ ord: a }: any, { ord: b }: any) => a - b)
+										.map(({ name }: any) => name),
+									fieldValues: note.flds.split('\u001f'),
+									frontTemplate: qfmt,
+									backTemplate: afmt
+								}),
 								viewCount: 0,
 								reviewCount: 0,
 								skipCount: 0,
@@ -162,19 +168,30 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 							console.log(`Card ${cards.length}/${noteRows.length} added to queue`)
 						}
 						
-						const batch = firestore.batch()
+						console.log(`Uploading ${cards.length} cards...`)
 						
-						for (const card of cards)
-							batch.set(
-								firestore.collection(`decks/${deckId}/cards`).doc(),
-								card
-							)
+						const chunked = _.chunk(cards, 500)
+						let i = 0
 						
-						console.log('Committing write batch for cards...')
+						for (const chunk of chunked) {
+							const message = `Uploading card chunk ${++i}/${chunked.length}... `
+							
+							process.stdout.write(`${message}0/${chunk.length}\r`)
+							
+							const batch = firestore.batch()
+							
+							for (const card of chunk)
+								batch.set(
+									firestore.collection(`decks/${deckId}/cards`).doc(),
+									card
+								)
+							
+							await batch.commit()
+							
+							console.log(`${message}${chunk.length}/${chunk.length}`)
+						}
 						
-						await batch.commit()
-						
-						console.log('Committed write batch for cards')
+						console.log(`Uploaded ${cards.length} cards`)
 						
 						resolve()
 					} catch (error) {
@@ -185,7 +202,38 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 		})
 	)
 
-const getCardSides = async (
+const uploadAssets = async () => {
+	const chunked = _.chunk(assets, ASSET_CHUNK_SIZE)
+	let i = 0
+	
+	for (const chunk of chunked) {
+		const message = `Uploading asset chunk ${++i}/${chunked.length}... `
+		
+		process.stdout.write(`${message}0/${chunk.length}\r`)
+		
+		let j = 0
+		
+		await Promise.all(chunk.map(({ path, destination, contentType, token }) =>
+			storage
+				.upload(path, {
+					destination,
+					public: true,
+					metadata: {
+						contentType,
+						owner: ACCOUNT_ID,
+						metadata: {
+							firebaseStorageDownloadTokens: token
+						}
+					}
+				})
+				.then(() => process.stdout.write(`${message}${++j}/${chunk.length}\r`))
+		))
+		
+		console.log()
+	}
+}
+
+const getCardSides = (
 	deckId: string,
 	{
 		path,
@@ -213,11 +261,11 @@ const getCardSides = async (
 		back = replaceFieldInTemplate(field, value, back)
 	})
 	
-	front = await replaceAssetsInTemplate(deckId, path, assetMap, front)
+	front = replaceAssetsInTemplate(deckId, path, assetMap, front)
 	
 	return {
 		front,
-		back: await replaceAssetsInTemplate(
+		back: replaceAssetsInTemplate(
 			deckId,
 			path,
 			assetMap,
@@ -229,16 +277,15 @@ const getCardSides = async (
 const replaceFieldInTemplate = (name: string, value: string, template: string) =>
 	template.replace(new RegExp(`\\{\\{\\s*${name}\\s*\\}\\}`, 'g'), value)
 
-const replaceAssetsInTemplate = async (deckId: string, path: string, assetMap: AssetMap, template: string) => {
+const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMap, template: string) => {
 	let temp = template
 	
 	for (const { match, captures } of matchAll(template, IMAGE_SRC_REGEX)) {
 		const name = captures[0].trim()
 		
 		console.log(`Found asset in card template: ${name}`)
-		console.log('Loading asset url...')
 		
-		const url = await getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
+		const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
 		
 		console.log(`Found asset url: ${url}`)
 		
@@ -252,9 +299,8 @@ const replaceAssetsInTemplate = async (deckId: string, path: string, assetMap: A
 		const name = captures[0].trim()
 		
 		console.log(`Found asset in card template: ${name}`)
-		console.log('Loading asset url...')
 		
-		const url = await getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
+		const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
 		
 		console.log(`Found asset url: ${url}`)
 		
@@ -267,32 +313,23 @@ const replaceAssetsInTemplate = async (deckId: string, path: string, assetMap: A
 	return temp
 }
 
-const getAssetUrl = async (deckId: string, path: string, name: string) =>
-	assetPathCache[path] ?? cacheAssetPath(path, await uploadAsset(deckId, path, name))
+const getAssetUrl = (deckId: string, path: string, name: string) =>
+	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
 
-const uploadAsset = async (deckId: string, path: string, name: string) => {
+const addAsset = (deckId: string, path: string, name: string) => {
 	const token = uuid()
-	const id = uuid()
+	const { id } = firestore.collection('deck-assets').doc()
 	const contentType = mime.getType(name)
 	
 	if (contentType === null)
-		return Promise.reject('Invalid content type')
+		throw new Error('Invalid content type')
 	
-	console.log(`Uploading asset with content type "${contentType}"`)
-	
-	await storage.upload(path, {
+	assets.push({
+		path,
 		destination: `deck-assets/${deckId}/${id}`,
-		public: true,
-		metadata: {
-			contentType,
-			owner: ACCOUNT_ID,
-			metadata: {
-				firebaseStorageDownloadTokens: token
-			}
-		}
+		contentType,
+		token
 	})
-	
-	console.log('Finished uploading asset')
 	
 	return `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${deckId}%2F${id}?alt=media&token=${token}`
 }
