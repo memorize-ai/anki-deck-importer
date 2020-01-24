@@ -14,15 +14,10 @@ export const BLACKLISTED_DECKS = [
 	'1910608929'
 ]
 
-export const TOPICS = [
-	'javascript',
-	'html',
-	'english',
-	'spanish'
-]
+export const IMAGE_SRC_REGEX = /<img\s+[^>]*src\s*=\s*["'](.+?)["'][^>]*\/?>/
 
-export const IMAGE_SRC_REGEX = /<img\s+[^>]*src\s*=\s*["']([^>]*)["'][^>]*\/?>/
-
-export const SOUND_URL_REGEX = /\[\s*[Ss][Oo][Uu][Nn][Dd]\s*\:\s*([^\]]+)\s*\]/
+export const SOUND_URL_REGEX = /\[\s*[Ss][Oo][Uu][Nn][Dd]\s*\:\s*(.+?)\s*\]/
 
 export const FIREBASE_ADMIN_KEY_PATH = join(__dirname, '../protected/firebase-admin.json')
+
+export const TOPICS_PATH = join(__dirname, '../products/topics.json')

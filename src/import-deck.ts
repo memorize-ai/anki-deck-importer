@@ -266,7 +266,7 @@ const formatAssetName = (name: string) =>
 	_.capitalize(name.split('.')[0].replace(/[\-_\s]+/g, ' '))
 
 const unzipDeck = (path: string) => {
-	const zippedFile = `${path}/*.apkg`
+	const zippedFile = `${path}/main.apkg`
 	return system(`unzip '${zippedFile}' -d '${path}' && rm -rf '${zippedFile}'`, 32 * 1024 * 1024)
 }
 
