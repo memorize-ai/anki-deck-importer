@@ -25,21 +25,21 @@ const assets: {
 export default async (deckId: string, topicIds: string[]) => {
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
-	console.log('Unzipping deck...')
+	process.stdout.write('Unzipping deck...')
 	
 	await unzipDeck(path)
 	
-	console.log('Unzipped deck')
+	console.log(' DONE')
 	
 	const db = new sqlite3.Database(`${path}/collection.anki2`)
 	
 	await new Promise(resolve =>
 		db.serialize(async () => {
-			console.log('Importing deck data...')
+			process.stdout.write('Importing deck data...')
 			
 			await importDeck(db, deckId, topicIds)
 			
-			console.log('Imported deck data')
+			console.log(' DONE')
 			
 			await importCards(db, deckId, path, assetMapForPath(path))
 			
@@ -52,11 +52,12 @@ export default async (deckId: string, topicIds: string[]) => {
 	await uploadAssets()
 	
 	console.log(`Uploaded ${assets.length} assets`)
-	console.log('Deleting deck path...')
+	
+	process.stdout.write('Deleting deck path...')
 	
 	await deleteDeck(path)
 	
-	console.log('Deleted deck path')
+	console.log(' DONE')
 	
 	return deckId
 }
