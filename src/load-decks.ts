@@ -20,7 +20,8 @@ export default async (topics: Record<string, string[]> = require(TOPICS_PATH)) =
 				continue
 			}
 			
-			const deckIds: string[] = JSON.parse(match[1]).map((array: [number]) => array[0].toString())
+			const deckIds: string[] = JSON.parse(match[1])
+				.map(([deckId]: [number]) => deckId.toString())
 			
 			for (const deckId of deckIds)
 				addDeck(deckId, topicId)
