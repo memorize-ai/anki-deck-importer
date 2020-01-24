@@ -11,7 +11,7 @@ const decks: Record<string, {
 
 export default async () => {
 	for (const [deckId, deckData] of Object.entries(decks)) {
-		if (deckData.imported)
+		if (deckData.imported || !deckData.downloaded)
 			continue
 		
 		await importDeck(deckId, deckData.topics)
