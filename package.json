@@ -1,5 +1,5 @@
 {
-	"name": "anki-importer",
+	"name": "memorize.ai-anki-deck-importer",
 	"description": "Anki deck importer for memorize.ai",
 	"scripts": {
 		"load-topics": "npm run build && node lib/load-topics --max-old-space-size=24576",
