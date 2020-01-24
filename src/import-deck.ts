@@ -50,7 +50,7 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 			
 			await firestore
 				.doc(`decks/${deckId}`)
-				.set({
+				.create({
 					topics: topicIds.reduce((acc, topicId) => [
 						...acc,
 						...topics[topicId] ?? []
