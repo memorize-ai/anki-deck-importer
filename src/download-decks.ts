@@ -19,6 +19,8 @@ export default async () => {
 		deckData.downloaded = true
 		
 		writeFile(DECKS_PATH, JSON.stringify(decks))
+		
+		console.log(`Downloaded deck with ID ${deckId}`)
 	}
 }
 
