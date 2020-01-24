@@ -7,8 +7,7 @@
 		"download-decks": "npm run build && node lib/download-decks --max-old-space-size=24576",
 		"import-decks": "npm run build && node lib/import-decks --max-old-space-size=24576",
 		
-		"build": "node_modules/.bin/tsc",
-		"start": "npm run build && node lib"
+		"build": "node_modules/.bin/tsc"
 	},
 	"dependencies": {
 		"firebase-admin": "^8.9.2",
