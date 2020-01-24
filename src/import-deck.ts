@@ -8,13 +8,14 @@ import { Database } from 'sqlite3'
 import sqlite3 from './sqlite3'
 
 import { matchAll } from './helpers'
-import { DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX } from './constants'
+import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX } from './constants'
 
 type AssetMap = Record<string, string>
 
+const topics: Record<string, string[]> = require(TOPICS_PATH)
 const assetPathCache: Record<string, string> = {}
 
-export default async (deckId: string, topics: string[]) => {
+export default async (deckId: string, topicIds: string[]) => {
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
 	await unzipDeck(path)
@@ -23,7 +24,7 @@ export default async (deckId: string, topics: string[]) => {
 	
 	await new Promise(resolve =>
 		db.serialize(async () => {
-			await importDeck(db, deckId, topics)
+			await importDeck(db, deckId, topicIds)
 			await importCards(db, deckId, path, assetMapForPath(path))
 			
 			resolve()
@@ -35,7 +36,7 @@ export default async (deckId: string, topics: string[]) => {
 	return deckId
 }
 
-const importDeck = (db: Database, deckId: string, topics: string[]) =>
+const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 	new Promise((resolve, reject) =>
 		db.each('SELECT decks FROM col LIMIT 1', async (error, row) => {
 			if (error) {
@@ -50,7 +51,10 @@ const importDeck = (db: Database, deckId: string, topics: string[]) =>
 			await firestore
 				.doc(`decks/${deckId}`)
 				.set({
-					topics,
+					topics: topicIds.reduce((acc, topicId) => [
+						...acc,
+						...topics[topicId] ?? []
+					], [] as string[]),
 					hasImage: false,
 					name: deck.name.replace(/\s+/g, ' '),
 					subtitle: '',
