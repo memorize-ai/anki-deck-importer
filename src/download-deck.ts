@@ -4,9 +4,8 @@ import fetch from 'node-fetch'
 import { DECKS_DOWNLOAD_PATH } from './constants'
 
 export default async (deckId: string) => {
-	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
-	
 	const data = await getDeckData(deckId)
+	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
 	mkdir(path)
 	
