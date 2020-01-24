@@ -14,7 +14,12 @@ export default async () => {
 		if (deckData.imported || !deckData.downloaded)
 			continue
 		
-		await importDeck(deckId, deckData.topics)
+		try {
+			await importDeck(deckId, deckData.topics)
+		} catch (error) {
+			console.error(error)
+			continue
+		}
 		
 		deckData.imported = true
 		

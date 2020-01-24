@@ -136,7 +136,7 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 							const model = models[note.mid]
 							const { qfmt, afmt } = model.tmpls[card.ord]
 							
-							const sides = await getCardSides({
+							const sides = await getCardSides(deckId, {
 								path,
 								assetMap,
 								fieldNames: model.flds
@@ -159,7 +159,7 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 									.filter(Boolean)
 							})
 							
-							console.log('Card added to queue')
+							console.log(`Card ${cards.length}/${noteRows.length} added to queue`)
 						}
 						
 						const batch = firestore.batch()
@@ -186,6 +186,7 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 	)
 
 const getCardSides = async (
+	deckId: string,
 	{
 		path,
 		assetMap,
@@ -212,11 +213,12 @@ const getCardSides = async (
 		back = replaceFieldInTemplate(field, value, back)
 	})
 	
-	front = await replaceAssetsInTemplate(path, assetMap, front)
+	front = await replaceAssetsInTemplate(deckId, path, assetMap, front)
 	
 	return {
 		front,
 		back: await replaceAssetsInTemplate(
+			deckId,
 			path,
 			assetMap,
 			replaceFieldInTemplate('FrontSide', front, back)
@@ -227,7 +229,7 @@ const getCardSides = async (
 const replaceFieldInTemplate = (name: string, value: string, template: string) =>
 	template.replace(new RegExp(`\\{\\{\\s*${name}\\s*\\}\\}`, 'g'), value)
 
-const replaceAssetsInTemplate = async (path: string, assetMap: AssetMap, template: string) => {
+const replaceAssetsInTemplate = async (deckId: string, path: string, assetMap: AssetMap, template: string) => {
 	let temp = template
 	
 	for (const { match, captures } of matchAll(template, IMAGE_SRC_REGEX)) {
@@ -236,7 +238,7 @@ const replaceAssetsInTemplate = async (path: string, assetMap: AssetMap, templat
 		console.log(`Found asset in card template: ${name}`)
 		console.log('Loading asset url...')
 		
-		const url = await getAssetUrl(`${path}/${assetMap[name]}`, name)
+		const url = await getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
 		
 		console.log(`Found asset url: ${url}`)
 		
@@ -252,7 +254,7 @@ const replaceAssetsInTemplate = async (path: string, assetMap: AssetMap, templat
 		console.log(`Found asset in card template: ${name}`)
 		console.log('Loading asset url...')
 		
-		const url = await getAssetUrl(`${path}/${assetMap[name]}`, name)
+		const url = await getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
 		
 		console.log(`Found asset url: ${url}`)
 		
@@ -265,21 +267,21 @@ const replaceAssetsInTemplate = async (path: string, assetMap: AssetMap, templat
 	return temp
 }
 
-const getAssetUrl = async (path: string, name: string) =>
-	assetPathCache[path] ?? cacheAssetPath(path, await uploadAsset(path, name))
+const getAssetUrl = async (deckId: string, path: string, name: string) =>
+	assetPathCache[path] ?? cacheAssetPath(path, await uploadAsset(deckId, path, name))
 
-const uploadAsset = async (path: string, name: string) => {
+const uploadAsset = async (deckId: string, path: string, name: string) => {
 	const token = uuid()
-	const { id } = firestore.collection('decks').doc()
+	const id = uuid()
 	const contentType = mime.getType(name)
 	
 	if (contentType === null)
 		return Promise.reject('Invalid content type')
 	
-	console.log(`Uploading asset with contentType "${contentType}"`)
+	console.log(`Uploading asset with content type "${contentType}"`)
 	
 	await storage.upload(path, {
-		destination: `deck-assets/${id}`,
+		destination: `deck-assets/${deckId}/${id}`,
 		public: true,
 		metadata: {
 			contentType,
@@ -292,7 +294,7 @@ const uploadAsset = async (path: string, name: string) => {
 	
 	console.log('Finished uploading asset')
 	
-	return `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${id}?alt=media&token=${token}`
+	return `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${deckId}%2F${id}?alt=media&token=${token}`
 }
 
 const cacheAssetPath = (path: string, url: string) =>
