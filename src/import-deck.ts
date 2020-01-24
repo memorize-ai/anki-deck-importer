@@ -9,7 +9,7 @@ import { Database } from 'sqlite3'
 import sqlite3 from './sqlite3'
 
 import { matchAll } from './helpers'
-import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE } from './constants'
+import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE, DEFAULT_STORAGE_BUCKET } from './constants'
 
 type AssetMap = Record<string, string>
 
@@ -332,7 +332,7 @@ const addAsset = (deckId: string, path: string, name: string) => {
 		token
 	})
 	
-	return `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${deckId}%2F${id}?alt=media&token=${token}`
+	return `https://firebasestorage.googleapis.com/v0/b/${DEFAULT_STORAGE_BUCKET}/o/deck-assets%2F${deckId}%2F${id}?alt=media&token=${token}`
 }
 
 const cacheAssetPath = (path: string, url: string) =>

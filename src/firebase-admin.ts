@@ -1,10 +1,10 @@
 import * as admin from 'firebase-admin'
 
-import { FIREBASE_ADMIN_KEY_PATH } from './constants'
+import { FIREBASE_ADMIN_KEY_PATH, DEFAULT_STORAGE_BUCKET } from './constants'
 
 admin.initializeApp({
 	credential: admin.credential.cert(FIREBASE_ADMIN_KEY_PATH),
-	storageBucket: 'memorize-ai-dev.appspot.com'
+	storageBucket: DEFAULT_STORAGE_BUCKET
 })
 
 export default admin
