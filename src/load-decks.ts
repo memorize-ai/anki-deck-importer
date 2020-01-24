@@ -3,6 +3,12 @@ import fetch from 'node-fetch'
 
 import { TOPICS_PATH, DECKS_PATH } from './constants'
 
+const decks: Record<string, {
+	downloaded: boolean
+	imported: boolean
+	topics: string[]
+}> = require(DECKS_PATH)
+
 export default async (topics: Record<string, string[]> = require(TOPICS_PATH)) => {
 	for (const [topicId, topicNames] of Object.entries(topics))
 		for (const topicName of topicNames) {
@@ -24,12 +30,6 @@ export default async (topics: Record<string, string[]> = require(TOPICS_PATH)) =
 }
 
 const addDeck = (deckId: string, topicId: string) => {
-	const decks: Record<string, {
-		downloaded: boolean
-		imported: boolean
-		topics: string[]
-	}> = require(DECKS_PATH)
-	
 	const existingDeck = decks[deckId]
 	
 	existingDeck
