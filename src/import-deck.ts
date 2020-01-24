@@ -1,3 +1,4 @@
+import { readFileSync as readFile } from 'fs'
 import * as _ from 'lodash'
 import * as mime from 'mime'
 import * as uuid from 'uuid/v4'
@@ -18,20 +19,36 @@ const assetPathCache: Record<string, string> = {}
 export default async (deckId: string, topicIds: string[]) => {
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
+	console.log('Unzipping deck...')
+	
 	await unzipDeck(path)
+	
+	console.log('Unzipped deck')
 	
 	const db = new sqlite3.Database(`${path}/collection.anki2`)
 	
 	await new Promise(resolve =>
 		db.serialize(async () => {
+			console.log('Importing deck data...')
+			
 			await importDeck(db, deckId, topicIds)
+			
+			console.log('Imported deck data')
+			console.log('Importing cards...')
+			
 			await importCards(db, deckId, path, assetMapForPath(path))
+			
+			console.log('Imported cards')
 			
 			resolve()
 		})
 	)
 	
+	console.log('Deleting deck path...')
+	
 	await deleteDeck(path)
+	
+	console.log('Deleted deck path')
 	
 	return deckId
 }
@@ -119,7 +136,7 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 							const model = models[note.mid]
 							const { qfmt, afmt } = model.tmpls[card.ord]
 							
-							const sides = await getCardSides(deckId, {
+							const sides = await getCardSides({
 								path,
 								assetMap,
 								fieldNames: model.flds
@@ -141,6 +158,8 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 									.map((tag: string) => tag.trim().toLowerCase())
 									.filter(Boolean)
 							})
+							
+							console.log('Card added to queue')
 						}
 						
 						const batch = firestore.batch()
@@ -151,7 +170,11 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 								card
 							)
 						
+						console.log('Committing write batch for cards...')
+						
 						await batch.commit()
+						
+						console.log('Committed write batch for cards')
 						
 						resolve()
 					} catch (error) {
@@ -163,7 +186,6 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 	)
 
 const getCardSides = async (
-	deckId: string,
 	{
 		path,
 		assetMap,
@@ -211,22 +233,32 @@ const replaceAssetsInTemplate = async (path: string, assetMap: AssetMap, templat
 	for (const { match, captures } of matchAll(template, IMAGE_SRC_REGEX)) {
 		const name = captures[0].trim()
 		
+		console.log(`Found asset in card template: ${name}`)
+		console.log('Loading asset url...')
+		
+		const url = await getAssetUrl(`${path}/${assetMap[name]}`, name)
+		
+		console.log(`Found asset url: ${url}`)
+		
 		temp = temp.replace(
 			match,
-			`<img src="${
-				await getAssetUrl(`${path}/${assetMap[name]}`, name)
-			}" alt="${formatAssetName(name)}">`
+			`<img src="${url}" alt="${formatAssetName(name)}">`
 		)
 	}
 	
 	for (const { match, captures } of matchAll(template, SOUND_URL_REGEX)) {
 		const name = captures[0].trim()
 		
+		console.log(`Found asset in card template: ${name}`)
+		console.log('Loading asset url...')
+		
+		const url = await getAssetUrl(`${path}/${assetMap[name]}`, name)
+		
+		console.log(`Found asset url: ${url}`)
+		
 		temp = temp.replace(
 			match,
-			`<audio controls src="${
-				await getAssetUrl(`${path}/${assetMap[name]}`, name)
-			}">Audio unavailable: ${formatAssetName(name)}</audio>`
+			`<audio controls src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
 		)
 	}
 	
@@ -244,23 +276,23 @@ const uploadAsset = async (path: string, name: string) => {
 	if (contentType === null)
 		return Promise.reject('Invalid content type')
 	
-	const error = (
-		await storage.upload(path, {
-			destination: `deck-assets/${id}`,
-			public: true,
-			metadata: {
-				contentType,
-				owner: ACCOUNT_ID,
-				metadata: {
-					firebaseStorageDownloadTokens: token
-				}
-			}
-		})
-	)[1]
+	console.log(`Uploading asset with contentType "${contentType}"`)
 	
-	return error
-		? Promise.reject(error)
-		: `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${id}?alt=media&token=${token}`
+	await storage.upload(path, {
+		destination: `deck-assets/${id}`,
+		public: true,
+		metadata: {
+			contentType,
+			owner: ACCOUNT_ID,
+			metadata: {
+				firebaseStorageDownloadTokens: token
+			}
+		}
+	})
+	
+	console.log('Finished uploading asset')
+	
+	return `https://firebasestorage.googleapis.com/v0/b/memorize-ai-dev.appspot.com/o/deck-assets%2F${id}?alt=media&token=${token}`
 }
 
 const cacheAssetPath = (path: string, url: string) =>
@@ -278,4 +310,4 @@ const deleteDeck = (path: string) =>
 	system(`rm -rf '${path}'`)
 
 const assetMapForPath = (path: string) =>
-	_.invert(require(`${path}/media`) || {})
+	_.invert(JSON.parse(readFile(`${path}/media`).toString() || '{}'))
