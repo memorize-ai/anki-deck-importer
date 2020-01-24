@@ -8,10 +8,10 @@ export default async () => {
 	
 	const topics = docs.reduce((acc, doc) => ({
 		...acc,
-		[doc.id]: doc.get('name')
+		[doc.id]: [doc.get('name')]
 	}), {})
 	
-	writeFile(TOPICS_PATH, JSON.stringify(topics))
+	writeFile(TOPICS_PATH, JSON.stringify(topics, null, '\t'))
 	
 	return topics
 }

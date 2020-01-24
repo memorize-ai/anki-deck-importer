@@ -21,7 +21,9 @@
 
 ```json
 {
-	"TOPIC_ID": "TOPIC_NAME"
+	"TOPIC_ID": [
+		"TOPIC_NAME"
+	]
 }
 ```
 
