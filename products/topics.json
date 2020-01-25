@@ -1,6 +1,5 @@
 {
 	"0VSTTWPIbwnSBxCQ30gX": [
-		"Mandarin Chinese",
 		"Mandarin",
 		"Chinese"
 	],
@@ -21,9 +20,7 @@
 	],
 	"5NIkicFwnbACBiDe2SaN": [
 		"Music",
-		"Instrument",
-		"Instruments",
-		"Instrumental"
+		"Instrument"
 	],
 	"5iZ1UieVg7dKfuzgRwGs": [
 		"Portuguese"
@@ -37,16 +34,14 @@
 	],
 	"6sDZBQlPpA4P30jBWybV": [
 		"Competitive Programming",
-		"USACO",
-		"Competitive Programming Prep"
+		"USACO"
 	],
 	"7QWKjdXH7npO6vRtcV3V": [
 		"Pathology"
 	],
 	"7WW21eqA8ialmHeGGnwP": [
 		"CSS",
-		"Cascading Style Sheets",
-		"CSS3"
+		"Cascading Style Sheets"
 	],
 	"AIaE8Jldn4vNdMrwJ0w0": [
 		"C#",
@@ -58,8 +53,7 @@
 		"F=ma",
 		"Competitive Physics",
 		"High school physics",
-		"AP Physics",
-		"Physics Prep"
+		"AP Physics"
 	],
 	"BgNbDykdbHPRUYQODJme": [
 		"French"
@@ -72,7 +66,6 @@
 	],
 	"FikFCH5fjejGY7HK1wju": [
 		"C++",
-		"CPP",
 		"C Plus Plus"
 	],
 	"G37iYaDmPgPebXueeJKP": [
@@ -86,9 +79,9 @@
 	],
 	"MD1OLR5G7YGOh3Ajudem": [
 		"iOS Dev",
-		"iOS Development",
 		"iOS",
 		"Swift",
+		"SwiftUI",
 		"Objective-C",
 		"Objective C",
 		"iPhone Development",
@@ -102,7 +95,6 @@
 	],
 	"Ru58I1fgSGSmoJttMeOg": [
 		"Languages",
-		"Mandarin Chinese",
 		"Mandarin",
 		"Chinese",
 		"Bengali",
@@ -122,9 +114,7 @@
 		"Malay"
 	],
 	"WaICCmek5bGIzvXX0UUs": [
-		"Competition Prep",
 		"Competition",
-		"Competitions",
 		"Competitive",
 		"Compete"
 	],
@@ -152,7 +142,6 @@
 	"gz0etu5vDvetQQtsn0Gm": [
 		"Web Dev",
 		"Web",
-		"Web Development",
 		"Website",
 		"HTML",
 		"CSS",
@@ -161,13 +150,10 @@
 	"IDyF0oP3TdCVEUWrtERp": [
 		"Node.js",
 		"NodeJS",
-		"Node JS",
-		"Javascript"
+		"Node JS"
 	],
 	"hnlxYI7ZbZhAtT4vK6MN": [
 		"College Admissions",
-		"Harvard Admissions",
-		"Stanford Admissions",
 		"College Prep"
 	],
 	"hyYVtNBjalvbucWDcvYE": [
@@ -185,21 +171,18 @@
 	],
 	"iwKDjH30XbAvQ6DnRq0C": [
 		"Java",
-		"JVM",
-		"ByteCode"
+		"JVM"
 	],
 	"lL6WIG6xlxNezy3gPdBN": [
 		"Politics",
 		"Government",
 		"President",
-		"Presidents",
 		"Senate",
 		"Law"
 	],
 	"iaYpuFxQa0GaO1HyUxKH": [
 		"Government",
 		"President",
-		"Presidents",
 		"Senate",
 		"Law"
 	],
@@ -235,9 +218,7 @@
 	],
 	"sSYBJh81iDL7wlBtjRaU": [
 		"Law",
-		"Lawer",
-		"Bar Exam",
-		"Bar"
+		"Bar Exam"
 	],
 	"smvLr33MeVK5v7rTMl2H": [
 		"Spanish",
@@ -252,15 +233,11 @@
 		"Math",
 		"Calculus",
 		"AP Calculus",
-		"AP Calculus AB",
-		"AP Calculus BC",
 		"Mathematics"
 	],
 	"FtO1UDx3nWrKQIoVahLw": [
 		"Calculus",
-		"AP Calculus",
-		"AP Calculus AB",
-		"AP Calculus BC"
+		"AP Calculus"
 	],
 	"ujD2vPwOW04lprCQaJI7": [
 		"Elixir"
@@ -271,14 +248,12 @@
 	],
 	"yMrDETkJuFOonSYx3FUE": [
 		"Swift",
-		"iOS Swift",
-		"Swift Programming Language"
+		"iOS Swift"
 	],
 	"zATfCrnipxI5oJTUJ4f9": [
 		"English",
 		"AP English",
-		"Vocab",
-		"Vocabulary"
+		"Vocab"
 	],
 	"4VJiENpSGgnX6Yw7QPF4": [
 		"Literature"
