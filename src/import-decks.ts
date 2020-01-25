@@ -1,5 +1,6 @@
 import { writeFileSync as writeFile } from 'fs'
 
+import importDeck from './import-deck'
 import { DECKS_PATH } from './constants'
 
 const decks: Record<string, {
@@ -16,7 +17,7 @@ export default async () => {
 		console.log(`Importing deck with ID ${deckId}...`)
 		
 		try {
-			await require('./import-deck').default(deckId, deckData.topics)
+			await importDeck(deckId, deckData.topics)
 		} catch (error) {
 			console.error(error)
 			continue

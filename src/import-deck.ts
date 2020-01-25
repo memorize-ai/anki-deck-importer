@@ -9,13 +9,12 @@ import { Database } from 'sqlite3'
 import sqlite3 from './sqlite3'
 
 import { matchAll } from './helpers'
-import { TOPICS_PATH, DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE, DEFAULT_STORAGE_BUCKET } from './constants'
+import { DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE, DEFAULT_STORAGE_BUCKET } from './constants'
 
 type AssetMap = Record<string, string>
 
-const topics: Record<string, string[]> = require(TOPICS_PATH)
-const assetPathCache: Record<string, string> = {}
-const assets: {
+let assetPathCache: Record<string, string> = {}
+let assets: {
 	path: string
 	destination: string
 	contentType: string
@@ -23,6 +22,9 @@ const assets: {
 }[] = []
 
 export default async (deckId: string, topicIds: string[]) => {
+	assetPathCache = {}
+	assets = []
+	
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
 	process.stdout.write('Unzipping deck...')
@@ -31,33 +33,37 @@ export default async (deckId: string, topicIds: string[]) => {
 	
 	console.log(' DONE')
 	
-	const db = new sqlite3.Database(`${path}/collection.anki2`)
-	
-	await new Promise(resolve =>
-		db.serialize(async () => {
-			process.stdout.write('Importing deck data...')
-			
-			await importDeck(db, deckId, topicIds)
-			
-			console.log(' DONE')
-			
-			await importCards(db, deckId, path, assetMapForPath(path))
-			
-			resolve()
-		})
-	)
-	
-	console.log(`Uploading ${assets.length} assets...`)
-	
-	await uploadAssets()
-	
-	console.log(`Uploaded ${assets.length} assets`)
-	
-	process.stdout.write('Deleting deck path...')
-	
-	await deleteDeck(path)
-	
-	console.log(' DONE')
+	try {
+		const db = new sqlite3.Database(`${path}/collection.anki2`)
+		
+		await new Promise(resolve =>
+			db.serialize(async () => {
+				process.stdout.write('Importing deck data...')
+				
+				await importDeck(db, deckId, topicIds)
+				
+				console.log(' DONE')
+				
+				await importCards(db, deckId, path, assetMapForPath(path))
+				
+				db.close(() => resolve())
+			})
+		)
+		
+		console.log(`Uploading ${assets.length} assets...`)
+		
+		await uploadAssets()
+		
+		console.log(`Uploaded ${assets.length} assets`)
+		
+		process.stdout.write('Deleting deck path...')
+		
+		await deleteDeck(path)
+		
+		console.log(' DONE')
+	} catch (error) {
+		console.error(error)
+	}
 	
 	return deckId
 }
@@ -65,10 +71,8 @@ export default async (deckId: string, topicIds: string[]) => {
 const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 	new Promise((resolve, reject) =>
 		db.each('SELECT decks FROM col LIMIT 1', async (error, row) => {
-			if (error) {
-				reject(error.message)
-				return
-			}
+			if (error)
+				return reject(error.message)
 			
 			const deck: any = Object
 				.entries(JSON.parse(row.decks || '{}'))
@@ -77,10 +81,7 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 			await firestore
 				.doc(`decks/${deckId}`)
 				.create({
-					topics: topicIds.reduce((acc, topicId) => [
-						...acc,
-						...topics[topicId] ?? []
-					], [] as string[]),
+					topics: topicIds,
 					hasImage: false,
 					name: deck.name.replace(/\s+/g, ' '),
 					subtitle: '',

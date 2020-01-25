@@ -14,7 +14,12 @@ export default async () => {
 		if (deckData.downloaded)
 			continue
 		
-		await downloadDeck(deckId)
+		try {
+			await downloadDeck(deckId)
+		} catch (error) {
+			console.error(error)
+			break
+		}
 		
 		deckData.downloaded = true
 		
