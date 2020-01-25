@@ -1,47 +1,286 @@
 {
-	"-LsTixwkylElPOuT4ISw": [
-		"Geometry"
+	"0VSTTWPIbwnSBxCQ30gX": [
+		"Mandarin Chinese",
+		"Mandarin",
+		"Chinese"
 	],
-	"0WrYyMzPOlfn82BEPnTI": [
-		"Web Dev",
-		"Web",
-		"HTML",
+	"0rAxg2gnuu0upV8OS3MK": [
+		"Bengali"
+	],
+	"0sPXkCuMFJk7fMoUwCho": [
+		"PHP"
+	],
+	"1nyaGLB8FXg97l3r2qtN": [
+		"Ruby"
+	],
+	"3rufm9btfAr8P1kB7Nww": [
+		"Haskell"
+	],
+	"3yR99KHpUFRhkmB55VVF": [
+		"Python"
+	],
+	"5NIkicFwnbACBiDe2SaN": [
+		"Music",
+		"Instrument",
+		"Instruments",
+		"Instrumental"
+	],
+	"5iZ1UieVg7dKfuzgRwGs": [
+		"Portuguese"
+	],
+	"5lqAnFX8pA7HrLc8Xz2m": [
+		"Biology",
+		"AP Biology"
+	],
+	"6qtUPsmVIyPpPlitMUH5": [
+		"Hindustani"
+	],
+	"6sDZBQlPpA4P30jBWybV": [
+		"Competitive Programming",
+		"USACO",
+		"Competitive Programming Prep"
+	],
+	"7QWKjdXH7npO6vRtcV3V": [
+		"Pathology"
+	],
+	"7WW21eqA8ialmHeGGnwP": [
 		"CSS",
-		"Javascript"
+		"Cascading Style Sheets",
+		"CSS3"
 	],
-	"4gTxmXhlqhgtGIBoDF4t": [
-		"Politics",
-		"Government"
+	"AIaE8Jldn4vNdMrwJ0w0": [
+		"C#",
+		"C-Sharp",
+		"CSharp"
 	],
-	"5OirSUdKy0PCdv2ipgo5": [
-		"English"
-	],
-	"9e3kJWaGPON1BFCBzHsk": [
+	"BgILoe5A5nHgdInNSSCX": [
 		"Physics",
-		"F=ma"
+		"F=ma",
+		"Competitive Physics",
+		"High school physics",
+		"AP Physics",
+		"Physics Prep"
 	],
-	"CsvTRq31Hh3uCaVVOVaF": [
-		"CSS"
+	"BgNbDykdbHPRUYQODJme": [
+		"French"
 	],
-	"FKe2w5Fm6fB993fmV4n1": [
-		"Calculus"
+	"BsCR8vx2WcyQTSdAYMZ1": [
+		"Rust"
 	],
-	"HduQktAPPA6VjryzPpl0": [
-		"History"
+	"DNnCscNUURD0ujEONrUP": [
+		"R Programming Language"
 	],
-	"S6GZv25AExejSusoTHXM": [
-		"JavaScript"
+	"FikFCH5fjejGY7HK1wju": [
+		"C++",
+		"CPP",
+		"C Plus Plus"
 	],
-	"TLnhwkfavnEnh0Xh2CNs": [
+	"G37iYaDmPgPebXueeJKP": [
+		"Kotlin"
+	],
+	"HoxcRZg1gEHIYvOSmayx": [
+		"Perl"
+	],
+	"JwXZmkhx5Ql5AX48Bzmx": [
+		"Scheme"
+	],
+	"MD1OLR5G7YGOh3Ajudem": [
+		"iOS Dev",
+		"iOS Development",
+		"iOS",
+		"Swift",
+		"Objective-C",
+		"Objective C",
+		"iPhone Development",
+		"iPad Development"
+	],
+	"Mn8pW1htIHQn8oHXGG7h": [
+		"TypeScript"
+	],
+	"Nr4wR0rCpyr6leazwNPn": [
 		"Biology"
 	],
-	"fF6HiJTzrKauaCftgOdG": [
-		"Chemistry"
+	"Ru58I1fgSGSmoJttMeOg": [
+		"Languages",
+		"Mandarin Chinese",
+		"Mandarin",
+		"Chinese",
+		"Bengali",
+		"Portuguese",
+		"Hindustani",
+		"French",
+		"Malay",
+		"Arabic",
+		"Russian",
+		"Spanish",
+		"English"
 	],
-	"pyCaHxcfwaxUfPnJKdKB": [
-		"iOS Dev"
+	"S0zr23yWXlCGYxPhGjda": [
+		"Scala"
 	],
-	"uQdSE5RwYU0QvMeSkIg2": [
-		"HTML"
+	"Vd8ZFl9KkX6IMst8v6Sl": [
+		"Malay"
+	],
+	"WaICCmek5bGIzvXX0UUs": [
+		"Competition Prep",
+		"Competition",
+		"Competitions",
+		"Competitive",
+		"Compete"
+	],
+	"Xe1rTnVx9KmFjvwAJhhU": [
+		"SQL",
+		"Structured Query Language",
+		"MySQL",
+		"PostgreSQL"
+	],
+	"YtKooVwOJQtmUFH5qzSj": [
+		"Chemistry",
+		"AP Chemistry"
+	],
+	"ZKeFciQmWj2H0AHYgO2E": [
+		"English",
+		"AP English"
+	],
+	"dq0OAlvSRlaxXvVWBQ4u": [
+		"History",
+		"AP History"
+	],
+	"g58I9l4zXdwaQYWWPYnB": [
+		"Arabic"
+	],
+	"gz0etu5vDvetQQtsn0Gm": [
+		"Web Dev",
+		"Web",
+		"Web Development",
+		"Website",
+		"HTML",
+		"CSS",
+		"JavaScript"
+	],
+	"IDyF0oP3TdCVEUWrtERp": [
+		"Node.js",
+		"NodeJS",
+		"Node JS",
+		"Javascript"
+	],
+	"hnlxYI7ZbZhAtT4vK6MN": [
+		"College Admissions",
+		"Harvard Admissions",
+		"Stanford Admissions",
+		"College Prep"
+	],
+	"hyYVtNBjalvbucWDcvYE": [
+		"JavaScript",
+		"Java Script"
+	],
+	"iXkKYogxQwIjNU6s6V0T": [
+		"Science",
+		"Chemistry",
+		"AP Chemistry",
+		"Biology",
+		"AP Biology",
+		"Anatomy",
+		"AP Anatomy"
+	],
+	"iwKDjH30XbAvQ6DnRq0C": [
+		"Java",
+		"JVM",
+		"ByteCode"
+	],
+	"lL6WIG6xlxNezy3gPdBN": [
+		"Politics",
+		"Government",
+		"President",
+		"Presidents",
+		"Senate",
+		"Law"
+	],
+	"iaYpuFxQa0GaO1HyUxKH": [
+		"Government",
+		"President",
+		"Presidents",
+		"Senate",
+		"Law"
+	],
+	"lwQTBJEu5QgLILyHYiLo": [
+		"Programming",
+		"Coding",
+		"Program",
+		"Code"
+	],
+	"mDLQNJEQEP6ZBK2w2Ov9": [
+		"Anatomy",
+		"AP Anatomy"
+	],
+	"n2DcyI8uL1xqlFrASmCe": [
+		"HTML",
+		"HyperText Markup Language",
+		"Web",
+		"Website"
+	],
+	"p2uhl6Zsbxvw6im0M7dP": [
+		"History",
+		"AP History"
+	],
+	"pMOhAnsKtdC5XrDXy8Cv": [
+		"Russian"
+	],
+	"qoK6534U6D8yjrdJVOo7": [
+		"Erlang"
+	],
+	"rfattL0hodZE6QmNG4wX": [
+		"Geography",
+		"AP Geography"
+	],
+	"sSYBJh81iDL7wlBtjRaU": [
+		"Law",
+		"Lawer",
+		"Bar Exam",
+		"Bar"
+	],
+	"smvLr33MeVK5v7rTMl2H": [
+		"Spanish",
+		"AP Spanish"
+	],
+	"tE0XsYJRwahsCHPDhupf": [
+		"SAT Prep",
+		"SAT",
+		"College Entrance Exam"
+	],
+	"uGQIUGCGYPHYFhjbk3ry": [
+		"Math",
+		"Calculus",
+		"AP Calculus",
+		"AP Calculus AB",
+		"AP Calculus BC",
+		"Mathematics"
+	],
+	"FtO1UDx3nWrKQIoVahLw": [
+		"Calculus",
+		"AP Calculus",
+		"AP Calculus AB",
+		"AP Calculus BC"
+	],
+	"ujD2vPwOW04lprCQaJI7": [
+		"Elixir"
+	],
+	"w9Vo44lvttsbScYzimca": [
+		"Go",
+		"Go Programming Language"
+	],
+	"yMrDETkJuFOonSYx3FUE": [
+		"Swift",
+		"iOS Swift",
+		"Swift Programming Language"
+	],
+	"zATfCrnipxI5oJTUJ4f9": [
+		"English",
+		"AP English",
+		"Vocab",
+		"Vocabulary"
+	],
+	"4VJiENpSGgnX6Yw7QPF4": [
+		"Literature"
 	]
 }

@@ -1,6 +1,6 @@
 import { join } from 'path'
 
-export const DEBUG = true
+export const DEBUG = false
 
 export const ACCOUNT_ID = DEBUG ? '5xh8ODFbtIfBh7LjA0zGRlpc3kf1' : 'tte9RbI9akMzWfs1bWxJRz4nTou1'
 
