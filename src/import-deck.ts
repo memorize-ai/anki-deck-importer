@@ -102,7 +102,8 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 					favoriteCount: 0,
 					creator: ACCOUNT_ID,
 					created: admin.firestore.FieldValue.serverTimestamp(),
-					updated: admin.firestore.FieldValue.serverTimestamp()
+					updated: admin.firestore.FieldValue.serverTimestamp(),
+					source: 'anki'
 				})
 				.catch(reject)
 			
@@ -113,61 +114,58 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 const importCards = (db: Database, deckId: string, path: string, assetMap: AssetMap) =>
 	new Promise((resolve, reject) =>
 		db.each('SELECT models FROM col', (modelsError, modelsRow) => {
-			if (modelsError) {
-				reject(modelsError.message)
-				return
-			}
+			if (modelsError)
+				return reject(modelsError.message)
 			
 			db.all('SELECT * FROM cards', (cardsError, cardRows) => {
-				if (cardsError) {
-					reject(cardsError.message)
-					return
-				}
+				if (cardsError)
+					return reject(cardsError.message)
 				
 				db.all('SELECT * FROM notes', async (notesError, noteRows) => {
-					if (notesError) {
-						reject(notesError.message)
-						return
-					}
+					if (notesError)
+						return reject(notesError.message)
 					
 					const models = JSON.parse(modelsRow.models || '{}')
 					
 					try {
 						const cards: FirebaseFirestore.DocumentData[] = []
 						
-						for (const note of noteRows) {
-							const noteId = note.id
-							const card = cardRows.find(cardRow => cardRow.nid === noteId)
-							
-							if (!card)
-								continue
-							
-							const model = models[note.mid]
-							const { qfmt, afmt } = model.tmpls[card.ord]
-							
-							cards.push({
-								section: '',
-								...getCardSides(deckId, {
-									path,
-									assetMap,
-									fieldNames: model.flds
-										.sort(({ ord: a }: any, { ord: b }: any) => a - b)
-										.map(({ name }: any) => name),
-									fieldValues: note.flds.split('\u001f'),
-									frontTemplate: qfmt,
-									backTemplate: afmt
-								}),
-								viewCount: 0,
-								reviewCount: 0,
-								skipCount: 0,
-								tags: note.tags
-									.split(/\s+/)
-									.map((tag: string) => tag.trim().toLowerCase())
-									.filter(Boolean)
-							})
-							
-							console.log(`Card ${cards.length}/${noteRows.length} added to queue`)
-						}
+						for (const note of noteRows)
+							try {
+								const noteId = note.id
+								const card = cardRows.find(cardRow => cardRow.nid === noteId)
+								
+								if (!card)
+									throw new Error('Cannot find card')
+								
+								const model = models[note.mid]
+								const { qfmt, afmt } = model.tmpls[card.ord]
+								
+								cards.push({
+									section: '',
+									...getCardSides(deckId, {
+										path,
+										assetMap,
+										fieldNames: model.flds
+											.sort(({ ord: a }: any, { ord: b }: any) => a - b)
+											.map(({ name }: any) => name),
+										fieldValues: note.flds.split('\u001f'),
+										frontTemplate: qfmt,
+										backTemplate: afmt
+									}),
+									viewCount: 0,
+									reviewCount: 0,
+									skipCount: 0,
+									tags: note.tags
+										.split(/\s+/)
+										.map((tag: string) => tag.trim().toLowerCase())
+										.filter(Boolean)
+								})
+								
+								console.log(`Card ${cards.length}/${noteRows.length} added to queue`)
+							} catch (error) {
+								console.error(error)
+							}
 						
 						console.log(`Uploading ${cards.length} cards...`)
 						
@@ -228,6 +226,10 @@ const uploadAssets = async () => {
 					}
 				})
 				.then(() => process.stdout.write(`${message}${++j}/${chunk.length}\r`))
+				.catch(error => {
+					console.error(`Error uploading asset: ${error}`)
+					j++
+				})
 		))
 		
 		console.log()
@@ -281,35 +283,45 @@ const replaceFieldInTemplate = (name: string, value: string, template: string) =
 const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMap, template: string) => {
 	let temp = template
 	
-	for (const { match, captures } of matchAll(template, IMAGE_SRC_REGEX)) {
-		const name = captures[0].trim()
-		
-		console.log(`Found asset in card template: ${name}`)
-		
-		const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
-		
-		console.log(`Found asset url: ${url}`)
-		
-		temp = temp.replace(
-			match,
-			`<img src="${url}" alt="${formatAssetName(name)}">`
-		)
-	}
+	const imageMatches = matchAll(temp, IMAGE_SRC_REGEX)
 	
-	for (const { match, captures } of matchAll(template, SOUND_URL_REGEX)) {
-		const name = captures[0].trim()
-		
-		console.log(`Found asset in card template: ${name}`)
-		
-		const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
-		
-		console.log(`Found asset url: ${url}`)
-		
-		temp = temp.replace(
-			match,
-			`<audio controls src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
-		)
-	}
+	for (const { match, captures } of imageMatches)
+		try {
+			const name = captures[0].trim()
+			
+			console.log(`Found asset in card template: ${name}`)
+			
+			const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
+			
+			console.log(`Found asset url: ${url}`)
+			
+			temp = temp.replace(
+				match,
+				`<img src="${url}" alt="${formatAssetName(name)}">`
+			)
+		} catch (error) {
+			console.error(error)
+		}
+	
+	const soundMatches = matchAll(temp, SOUND_URL_REGEX)
+	
+	for (const { match, captures } of soundMatches)
+		try {
+			const name = captures[0].trim()
+			
+			console.log(`Found asset in card template: ${name}`)
+			
+			const url = getAssetUrl(deckId, `${path}/${assetMap[name]}`, name)
+			
+			console.log(`Found asset url: ${url}`)
+			
+			temp = temp.replace(
+				match,
+				`<audio controls src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
+			)
+		} catch (error) {
+			console.error(error)
+		}
 	
 	return temp
 }
@@ -339,11 +351,14 @@ const cacheAssetPath = (path: string, url: string) =>
 	assetPathCache[path] = url
 
 const formatAssetName = (name: string) =>
-	_.capitalize(name.split('.')[0].replace(/[\-_\s]+/g, ' '))
+	_.capitalize(name.split('.').slice(0, -1).join('.').replace(/[\-_\s]+/g, ' '))
 
 const unzipDeck = (path: string) => {
 	const zippedFile = `${path}/main.apkg`
-	return system(`unzip '${zippedFile}' -d '${path}' && rm -rf '${zippedFile}'`, 32 * 1024 * 1024)
+	return system(
+		`if [[ -e '${zippedFile}' ]]; then unzip '${zippedFile}' -d '${path}' && rm -rf '${zippedFile}'; fi`,
+		32 * 1024 * 1024
+	)
 }
 
 const deleteDeck = (path: string) =>

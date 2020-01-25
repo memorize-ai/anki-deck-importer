@@ -13,6 +13,8 @@ export default async () => {
 		if (deckData.imported || !deckData.downloaded)
 			continue
 		
+		console.log(`Importing deck with ID ${deckId}...`)
+		
 		try {
 			await require('./import-deck').default(deckId, deckData.topics)
 		} catch (error) {
