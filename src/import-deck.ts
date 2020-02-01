@@ -74,9 +74,14 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 			if (error)
 				return reject(error.message)
 			
-			const deck: any = Object
-				.entries(JSON.parse(row.decks || '{}'))
-				.filter(([key]) => key !== '1')[0][1]
+			const deck: any = (
+				Object
+					.entries(JSON.parse(row.decks || '{}'))
+					.find(([key]) => key !== '1') ?? []
+			)[1]
+			
+			if (!deck)
+				return reject('Unable to retrieve deck from SQLite3 database')
 			
 			await firestore
 				.doc(`decks/${deckId}`)
