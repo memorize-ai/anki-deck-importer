@@ -1,0 +1,3 @@
+#!/usr/bin/env zsh
+
+gsutil -m rm "gs://memorize-ai.appspot.com/deck-assets/$1/**"

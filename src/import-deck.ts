@@ -168,9 +168,16 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 								console.error(error)
 							}
 						
-						process.stdout.write(`Uploading ${cards.length} cards...`)
+						console.log(`Uploading ${cards.length} cards...`)
+					
+						const chunked = _.chunk(cards, 500)
+						let i = 0
 						
-						await Promise.all(_.chunk(cards, 500).map(chunk => {
+						for (const chunk of chunked) {
+							const message = `Uploading card chunk ${++i}/${chunked.length}... `
+							
+							process.stdout.write(`${message}0/${chunk.length}\r`)
+							
 							const batch = firestore.batch()
 							
 							for (const card of chunk)
@@ -179,10 +186,12 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 									card
 								)
 							
-							return batch.commit()
-						}))
+							await batch.commit()
+							
+							console.log(`${message}${chunk.length}/${chunk.length}`)
+						}
 						
-						console.log(' DONE')
+						console.log(`Uploaded ${cards.length} cards`)
 						
 						resolve()
 					} catch (error) {
