@@ -1,0 +1,7 @@
+#!/usr/bin/env node
+
+const { firestore } = require('./lib/firebase-admin')
+
+firestore.collection('decks').listDocuments()
+	.then(({ length }) => console.log(length))
+	.catch(console.error)
