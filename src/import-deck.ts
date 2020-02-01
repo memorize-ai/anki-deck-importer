@@ -44,7 +44,7 @@ export default async (deckId: string, topicIds: string[]) => {
 	try {
 		await unzipDeck(path)
 	} catch (error) {
-		process.stdout.write('Deleting deck path because of a malformed apkg file...')
+		process.stdout.write(' ERROR\nDeleting deck path...')
 		
 		rmdir(path, { recursive: true })
 		
