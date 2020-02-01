@@ -1,4 +1,8 @@
-import { readFileSync as readFile } from 'fs'
+import {
+	readFileSync as readFile,
+	writeFileSync as writeFile,
+	rmdirSync as rmdir
+} from 'fs'
 import * as _ from 'lodash'
 import * as mime from 'mime'
 import * as uuid from 'uuid/v4'
@@ -9,7 +13,15 @@ import { Database } from 'sqlite3'
 import sqlite3 from './sqlite3'
 
 import { matchAll } from './helpers'
-import { DECKS_DOWNLOAD_PATH, ACCOUNT_ID, IMAGE_SRC_REGEX, SOUND_URL_REGEX, ASSET_CHUNK_SIZE, DEFAULT_STORAGE_BUCKET } from './constants'
+import {
+	DECKS_PATH,
+	DECKS_DOWNLOAD_PATH,
+	ACCOUNT_ID,
+	IMAGE_SRC_REGEX,
+	SOUND_URL_REGEX,
+	ASSET_CHUNK_SIZE,
+	DEFAULT_STORAGE_BUCKET
+} from './constants'
 
 type AssetMap = Record<string, string>
 
@@ -29,7 +41,27 @@ export default async (deckId: string, topicIds: string[]) => {
 	
 	process.stdout.write('Unzipping deck...')
 	
-	await unzipDeck(path)
+	try {
+		await unzipDeck(path)
+	} catch (error) {
+		process.stdout.write('Deleting deck path because of a malformed apkg file...')
+		
+		rmdir(path, { recursive: true })
+		
+		const decks: Record<string, {
+			downloaded: boolean
+			imported: boolean
+			topics: string[]
+		}> = require(DECKS_PATH)
+		
+		decks[deckId].downloaded = false
+		
+		writeFile(DECKS_PATH, JSON.stringify(decks))
+		
+		console.log(' DONE')
+		
+		throw error
+	}
 	
 	console.log(' DONE')
 	
@@ -46,7 +78,7 @@ export default async (deckId: string, topicIds: string[]) => {
 				
 				await importCards(db, deckId, path, assetMapForPath(path))
 				
-				db.close(() => resolve())
+				db.close(resolve)
 			})
 		)
 		
