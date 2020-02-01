@@ -1,0 +1,10 @@
+#!/usr/bin/env node
+
+const decks = Object.values(require('./products/decks.json'))
+
+const totalDecks = decks.length
+const downloadedDecks = decks.reduce((acc, { downloaded }) => acc + downloaded, 0)
+const importedDecks = decks.reduce((acc, { imported }) => acc + imported, 0)
+
+console.log(`Downloaded: ${downloadedDecks}/${totalDecks} (${totalDecks - downloadedDecks} remaining)`)
+console.log(`Imported: ${importedDecks}/${totalDecks} (${totalDecks - importedDecks} remaining)`)
