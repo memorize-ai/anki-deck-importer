@@ -6,10 +6,10 @@
 		"load-decks": "npm run build && node lib/load-decks --max-old-space-size=24576",
 		"download-decks": "npm run build && node lib/download-decks --max-old-space-size=24576",
 		"import-decks": "npm run build && node lib/import-decks --max-old-space-size=24576",
-		
 		"build": "node_modules/.bin/tsc"
 	},
 	"dependencies": {
+		"chalk": "^3.0.0",
 		"firebase-admin": "^8.9.2",
 		"lodash": "^4.17.15",
 		"mime": "^2.4.4",

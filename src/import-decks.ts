@@ -1,4 +1,5 @@
 import { writeFileSync as writeFile } from 'fs'
+import * as chalk from 'chalk'
 
 import importDeck from './import-deck'
 import { DECKS_PATH } from './constants'
@@ -14,7 +15,7 @@ export default async () => {
 		if (deckData.imported || !deckData.downloaded)
 			continue
 		
-		console.log(`Importing deck with ID ${deckId}...`)
+		console.log(chalk`{yellow Importing deck with ID} {yellow.bold ${deckId}}{yellow ...}`)
 		
 		try {
 			await importDeck(deckId, deckData.topics)
@@ -27,7 +28,7 @@ export default async () => {
 		
 		writeFile(DECKS_PATH, JSON.stringify(decks))
 		
-		console.log(`Imported deck with ID ${deckId}`)
+		console.log(chalk`{green Imported deck with ID} {green.bold ${deckId}}`)
 	}
 }
 
