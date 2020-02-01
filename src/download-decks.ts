@@ -17,8 +17,14 @@ export default async () => {
 		try {
 			await downloadDeck(deckId)
 		} catch (error) {
-			console.error(error)
-			break
+			if (error.message === '"k" query parameter not found') {
+				delete decks[deckId]
+				writeFile(DECKS_PATH, JSON.stringify(decks))
+				
+				continue
+			}
+			
+			throw error
 		}
 		
 		deckData.downloaded = true
