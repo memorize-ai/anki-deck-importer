@@ -321,15 +321,16 @@ const getCardSides = (
 	})
 	
 	front = replaceAssetsInTemplate(deckId, path, assetMap, front)
+	back = replaceAssetsInTemplate(
+		deckId,
+		path,
+		assetMap,
+		replaceFieldInTemplate('FrontSide', front, back)
+	)
 	
 	return {
-		front,
-		back: replaceAssetsInTemplate(
-			deckId,
-			path,
-			assetMap,
-			replaceFieldInTemplate('FrontSide', front, back)
-		)
+		front: replaceKeywordsInTemplate(front),
+		back: replaceKeywordsInTemplate(back)
 	}
 }
 
@@ -381,6 +382,11 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 	
 	return temp
 }
+
+const replaceKeywordsInTemplate = (template: string) =>
+	template
+		.replace('[latex]', '\\(')
+		.replace('[/latex]', '\\)')
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
