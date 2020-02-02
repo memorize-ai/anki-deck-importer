@@ -50,7 +50,7 @@ const addDeck = (deckId: string, topicIds: string[]) => {
 		: decks[deckId] = {
 			downloaded: false,
 			imported: false,
-			topics: topicIds
+			topics: [...new Set(topicIds)]
 		}
 	
 	writeFile(DECKS_PATH, JSON.stringify(decks))
