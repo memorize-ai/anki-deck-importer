@@ -20,6 +20,7 @@ import {
 	IMAGE_SRC_REGEX,
 	SOUND_URL_REGEX,
 	ASSET_CHUNK_SIZE,
+	MAX_NUMBER_OF_CARDS_IN_SECTION,
 	DEFAULT_STORAGE_BUCKET
 } from './constants'
 
@@ -163,10 +164,13 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 					if (notesError)
 						return reject(notesError.message)
 					
-					const models = JSON.parse(modelsRow.models || '{}')
-					
 					try {
+						const models = JSON.parse(modelsRow.models || '{}')
 						const cards: FirebaseFirestore.DocumentData[] = []
+						
+						let section: string | undefined
+						let nextSectionIndex = 0
+						let sectionSize = 0
 						
 						for (const note of noteRows)
 							try {
@@ -179,14 +183,26 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 								const model = models[note.mid]
 								const { qfmt, afmt } = model.tmpls[card.ord]
 								
+								if (!(sectionSize % MAX_NUMBER_OF_CARDS_IN_SECTION)) {
+									process.stdout.write(`Creating section #${nextSectionIndex + 1}...`)
+									
+									section = await createSection(deckId, nextSectionIndex++)
+									sectionSize = 0
+									
+									console.log(' DONE')
+								}
+								
 								cards.push({
-									section: '',
+									section: section ?? '',
 									...getCardSides(deckId, {
 										path,
 										assetMap,
 										fieldNames: model.flds
-											.sort(({ ord: a }: any, { ord: b }: any) => a - b)
-											.map(({ name }: any) => name),
+											.sort((
+												{ ord: a }: { ord: number },
+												{ ord: b }: { ord: number }
+											) => a - b)
+											.map(({ name }: { name: string }) => name),
 										fieldValues: note.flds.split('\u001f'),
 										frontTemplate: qfmt,
 										backTemplate: afmt
@@ -200,7 +216,9 @@ const importCards = (db: Database, deckId: string, path: string, assetMap: Asset
 										.filter(Boolean)
 								})
 								
-								console.log(`Card ${cards.length}/${noteRows.length} added to queue`)
+								sectionSize++
+								
+								console.log(`Card ${cards.length}/${noteRows.length} added to queue with section #${nextSectionIndex}`)
 							} catch (error) {
 								console.error(error)
 							}
@@ -383,6 +401,18 @@ const addAsset = (deckId: string, path: string, name: string) => {
 	})
 	
 	return `https://firebasestorage.googleapis.com/v0/b/${DEFAULT_STORAGE_BUCKET}/o/deck-assets%2F${deckId}%2F${id}?alt=media&token=${token}`
+}
+
+const createSection = async (deckId: string, index: number) => {
+	const ref = firestore.collection(`decks/${deckId}/sections`).doc()
+	
+	await ref.create({
+		name: `Section ${index + 1}`,
+		index,
+		cardCount: 0
+	})
+	
+	return ref.id
 }
 
 const cacheAssetPath = (path: string, url: string) =>
