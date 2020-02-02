@@ -385,8 +385,8 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 
 const replaceKeywordsInTemplate = (template: string) =>
 	template
-		.replace('[latex]', '\\(')
-		.replace('[/latex]', '\\)')
+		.replace(/\[latex\]/g, '\\(')
+		.replace(/\[\/latex\]/g, '\\)')
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
