@@ -329,8 +329,8 @@ const getCardSides = (
 	)
 	
 	return {
-		front: replaceKeywordsInTemplate(front),
-		back: replaceKeywordsInTemplate(back)
+		front: replaceLatexInTemplate(front),
+		back: replaceLatexInTemplate(back)
 	}
 }
 
@@ -383,10 +383,38 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 	return temp
 }
 
-const replaceKeywordsInTemplate = (template: string) =>
-	template
-		.replace(/\[latex\]/g, '\\(')
-		.replace(/\[\/latex\]/g, '\\)')
+const replaceLatexInTemplate = (template: string) => {
+	let reassignableTemplate = template
+	
+	while (true) {
+		const match = reassignableTemplate.match(/\[latex\](.*?)\[\/latex\]/)
+		
+		if (match) {
+			let latexContent = match[1]
+			
+			while (true) {
+				const centeredMatch = latexContent.match(/\$\$(.+?)\$\$/)
+				if (centeredMatch) {
+					latexContent = latexContent.replace(centeredMatch[0], `\\[${centeredMatch[1]}\\]`)
+					continue
+				}
+				
+				const inlineMatch = latexContent.match(/\$(.+?)\$/)
+				if (inlineMatch) {
+					latexContent = latexContent.replace(inlineMatch[0], `\\(${inlineMatch[1]}\\)`)
+					continue
+				}
+				
+				break
+			}
+			
+			reassignableTemplate = reassignableTemplate.replace(match[0], latexContent)
+			continue
+		}
+		
+		return reassignableTemplate
+	}
+}
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
