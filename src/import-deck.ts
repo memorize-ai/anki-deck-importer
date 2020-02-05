@@ -425,7 +425,7 @@ const addAsset = (deckId: string, path: string, name: string) => {
 	const contentType = mime.getType(name)
 	
 	if (contentType === null)
-		throw new Error('Invalid content type')
+		throw new Error('Unknown content type')
 	
 	assets.push({
 		path,
