@@ -329,8 +329,8 @@ const getCardSides = (
 	)
 	
 	return {
-		front: replaceLatexInTemplate(front),
-		back: replaceLatexInTemplate(back)
+		front: removeTemplateExpressionsInTemplate(replaceLatexInTemplate(front)),
+		back: removeTemplateExpressionsInTemplate(replaceLatexInTemplate(back))
 	}
 }
 
@@ -415,6 +415,9 @@ const replaceLatexInTemplate = (template: string) => {
 		return reassignableTemplate
 	}
 }
+
+const removeTemplateExpressionsInTemplate = (template: string) =>
+	template.replace(/\{\{.*?\}\}/gm, '')
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
