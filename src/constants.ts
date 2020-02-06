@@ -16,6 +16,6 @@ export const IMAGE_SRC_REGEX = /<img.+?src\s*?=\s*?["'](.+?)["'].*?>/
 export const SOUND_URL_REGEX = /\[\s*?[Ss][Oo][Uu][Nn][Dd]\s*?\:\s*?(.+?)\s*?\]/
 
 export const ASSET_CHUNK_SIZE = 500
-export const MAX_NUMBER_OF_CARDS_IN_SECTION = 25
+export const MAX_NUMBER_OF_CARDS_IN_SECTION = 50
 
 export const DEFAULT_STORAGE_BUCKET = `memorize-ai${DEBUG ? '-dev' : ''}.appspot.com`
