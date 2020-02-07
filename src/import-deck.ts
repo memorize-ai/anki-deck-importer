@@ -339,7 +339,7 @@ const getCardSides = (
 }
 
 const replaceFieldInTemplate = (name: string, value: string, template: string) =>
-	template.replace(new RegExp(`\\{\\{\\s*${name}\\s*\\}\\}`, 'g'), value)
+	template.replace(new RegExp(`\\{\\{\\s*?${name}\\s*?\\}\\}`, 'g'), value)
 
 const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMap, template: string) => {
 	let temp = template
