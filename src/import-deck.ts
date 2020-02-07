@@ -121,9 +121,11 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 				.create({
 					topics: topicIds,
 					hasImage: false,
-					name: deck.name
-						.replace(/anki/ig, '')
-						.replace(/\s+/g, ' '),
+					name: _.capitalize(
+						deck.name
+							.replace(/anki|demo|test|\:\:/ig, ' ')
+							.replace(/\s+/g, ' ')
+					),
 					subtitle: '',
 					description: '',
 					viewCount: 0,
