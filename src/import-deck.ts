@@ -121,7 +121,9 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 				.create({
 					topics: topicIds,
 					hasImage: false,
-					name: deck.name.replace(/\s+/g, ' '),
+					name: deck.name
+						.replace(/anki/ig, '')
+						.replace(/\s+/g, ' '),
 					subtitle: '',
 					description: '',
 					viewCount: 0,
@@ -320,17 +322,17 @@ const getCardSides = (
 		back = replaceFieldInTemplate(field, value, back)
 	})
 	
-	front = replaceAssetsInTemplate(deckId, path, assetMap, front)
-	back = replaceAssetsInTemplate(
-		deckId,
-		path,
-		assetMap,
-		replaceFieldInTemplate('FrontSide', front, back)
-	)
-	
 	return {
-		front: removeTemplateExpressionsInTemplate(replaceLatexInTemplate(front)),
-		back: removeTemplateExpressionsInTemplate(replaceLatexInTemplate(back))
+		front: removeExtrasInTemplate(
+			replaceLatexInTemplate(
+				replaceAssetsInTemplate(deckId, path, assetMap, front)
+			)
+		),
+		back: removeExtrasInTemplate(
+			replaceLatexInTemplate(
+				replaceAssetsInTemplate(deckId, path, assetMap, back)
+			)
+		)
 	}
 }
 
@@ -416,8 +418,11 @@ const replaceLatexInTemplate = (template: string) => {
 	}
 }
 
-const removeTemplateExpressionsInTemplate = (template: string) =>
-	template.replace(/\{\{.*?\}\}/gm, '')
+const removeExtrasInTemplate = (template: string) =>
+	template
+		.replace(/\{\{.*?\}\}/g, '') // Template expressions
+		.replace(/<hr.*?id\s*?=\s*?["']?answer["']?.*?>/g, ' ') // <hr id=answer>
+		.replace(/anki/ig, '') // Anki
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
