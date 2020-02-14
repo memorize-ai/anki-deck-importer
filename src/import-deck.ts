@@ -358,7 +358,7 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 			
 			temp = temp.replace(
 				match,
-				`<img src="${url}" alt="${formatAssetName(name)}">`
+				`<figure class="image"><img src="${url}" alt="${formatAssetName(name)}"></figure>`
 			)
 		} catch (error) {
 			console.error(error)
@@ -378,7 +378,7 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 			
 			temp = temp.replace(
 				match,
-				`<audio controls src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
+				`<audio src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
 			)
 		} catch (error) {
 			console.error(error)
