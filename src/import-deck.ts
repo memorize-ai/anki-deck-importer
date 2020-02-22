@@ -125,6 +125,7 @@ const importDeck = (db: Database, deckId: string, topicIds: string[]) =>
 						deck.name
 							.replace(/anki|demo|test|\:\:/ig, ' ')
 							.replace(/\s+/g, ' ')
+							.trim()
 					),
 					subtitle: '',
 					description: '',
