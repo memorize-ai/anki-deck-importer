@@ -425,6 +425,7 @@ const removeExtrasInTemplate = (template: string) =>
 		.replace(/\{\{.*?\}\}/g, '') // Template expressions
 		.replace(/<hr.*?id\s*?=\s*?["']?answer["']?.*?>/g, ' ') // <hr id=answer>
 		.replace(/anki/ig, '') // Anki
+		.trim()
 
 const getAssetUrl = (deckId: string, path: string, name: string) =>
 	assetPathCache[path] ?? cacheAssetPath(path, addAsset(deckId, path, name))
