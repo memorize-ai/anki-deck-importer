@@ -69,17 +69,22 @@ export default async (deckId: string, topicIds: string[]) => {
 	try {
 		const db = new sqlite3.Database(`${path}/collection.anki2`)
 		
-		await new Promise(resolve =>
+		await new Promise((resolve, reject) =>
 			db.serialize(async () => {
-				process.stdout.write('Importing deck data...')
-				
-				await importDeck(db, deckId, topicIds)
-				
-				console.log(' DONE')
-				
-				await importCards(db, deckId, path, assetMapForPath(path))
-				
-				db.close(resolve)
+				try {
+					process.stdout.write('Importing deck data...')
+					
+					await importDeck(db, deckId, topicIds)
+					
+					console.log(' DONE')
+					
+					await importCards(db, deckId, path, assetMapForPath(path))
+					
+					db.close(resolve)
+				} catch (error) {
+					await deleteDeck(path)
+					reject(error)
+				}
 			})
 		)
 		
