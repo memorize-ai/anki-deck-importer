@@ -325,19 +325,25 @@ const getCardSides = (
 		back = replaceFieldInTemplate(field, value, back)
 	})
 	
-	return {
-		front: removeExtrasInTemplate(
-			replaceLatexInTemplate(
-				replaceAssetsInTemplate(deckId, path, assetMap, front)
-			)
-		),
-		back: removeExtrasInTemplate(
-			replaceLatexInTemplate(
-				replaceAssetsInTemplate(deckId, path, assetMap, back)
-			)
+	front = removeExtrasInTemplate(
+		replaceLatexInTemplate(
+			replaceAssetsInTemplate(deckId, path, assetMap, front)
 		)
-	}
+	)
+	back = removeExtrasInTemplate(
+		replaceLatexInTemplate(
+			replaceAssetsInTemplate(deckId, path, assetMap, back)
+		)
+	)
+	
+	if (cardSideIsEmpty(front) || cardSideIsEmpty(front))
+		throw new Error('One of the card sides are empty')
+	
+	return { front, back }
 }
+
+const cardSideIsEmpty = (side: string) =>
+	/^(?:<br>|&nbsp;|\s)*$/.test(side)
 
 const replaceFieldInTemplate = (name: string, value: string, template: string) =>
 	template.replace(new RegExp(`\\{\\{\\s*?${name}\\s*?\\}\\}`, 'g'), value)
