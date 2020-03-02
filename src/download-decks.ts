@@ -10,6 +10,8 @@ const decks: Record<string, {
 }> = require(DECKS_PATH)
 
 export default async () => {
+	let i = 0
+	
 	for (const [deckId, deckData] of Object.entries(decks)) {
 		if (deckData.downloaded)
 			continue
@@ -17,7 +19,7 @@ export default async () => {
 		try {
 			await downloadDeck(deckId)
 		} catch (error) {
-			if (error.message === '"k" query parameter not found') {
+			if (error.message === 'missing-k-query-parameter') {
 				delete decks[deckId]
 				writeFile(DECKS_PATH, JSON.stringify(decks))
 				
@@ -31,7 +33,7 @@ export default async () => {
 		
 		writeFile(DECKS_PATH, JSON.stringify(decks))
 		
-		console.log(`Downloaded deck with ID ${deckId}`)
+		console.log(`Downloaded deck with ID ${deckId} (${++i})`)
 	}
 }
 

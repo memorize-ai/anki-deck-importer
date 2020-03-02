@@ -388,10 +388,7 @@ const replaceAssetsInTemplate = (deckId: string, path: string, assetMap: AssetMa
 			
 			console.log(`Found asset url: ${url}`)
 			
-			temp = temp.replace(
-				match,
-				`<audio src="${url}">Audio unavailable: ${formatAssetName(name)}</audio>`
-			)
+			temp = temp.replace(match, `<audio src="${url}"></audio>`)
 		} catch (error) {
 			console.error(error)
 		}
@@ -411,7 +408,7 @@ const replaceLatexInTemplate = (template: string) => {
 			while (true) {
 				const centeredMatch = latexContent.match(/\$\$(.+?)\$\$/)
 				if (centeredMatch) {
-					latexContent = latexContent.replace(centeredMatch[0], `\\[${centeredMatch[1]}\\]`)
+					latexContent = latexContent.replace(centeredMatch[0], `$$${centeredMatch[1]}$$`)
 					continue
 				}
 				

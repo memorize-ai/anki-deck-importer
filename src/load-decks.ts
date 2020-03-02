@@ -1,7 +1,7 @@
 import { writeFileSync as writeFile } from 'fs'
-import fetch from 'node-fetch'
 
 import { TOPICS_PATH, DECKS_PATH } from './constants'
+import { request } from './helpers'
 
 const decks: Record<string, {
 	downloaded: boolean
@@ -11,8 +11,8 @@ const decks: Record<string, {
 
 export default async (topics: Record<string, string[]> = loadTopics(require(TOPICS_PATH))) => {	
 	for (const [name, topicIds] of Object.entries(topics)) {
-		const match = (await (await fetch(`https://ankiweb.net/shared/decks/${name}`)).text())
-			.match(/shared\.files\s=\s(\[.*\]?);/)
+		const { body } = await request(`https://ankiweb.net/shared/decks/${name}`)
+		const match = body?.match(/shared\.files\s=\s(\[.*\]?);/)
 		
 		if (!match) {
 			console.error(`Unable to load decks for topic ${name}`)

@@ -1,30 +1,26 @@
-import { mkdirSync as mkdir, createWriteStream } from 'fs'
-import fetch from 'node-fetch'
+import { mkdirSync as mkdir } from 'fs'
 
 import { DECKS_DOWNLOAD_PATH } from './constants'
+import { request, downloadRequest } from './helpers'
 
 export default async (deckId: string) => {
-	const data = await getDeckData(deckId)
 	const path = `${DECKS_DOWNLOAD_PATH}/${deckId}`
 	
 	mkdir(path)
-	
-	data.pipe(createWriteStream(`${path}/main.apkg`))
+	await downloadDeck(deckId, `${path}/main.apkg`)
 	
 	return deckId
 }
 
-const getDeckData = async (deckId: string) => {
-	const match = (await (await fetch(`https://ankiweb.net/shared/info/${deckId}`)).text())
-		.match(/<input type="hidden" name="k" value="(.*?)">/)
+const downloadDeck = async (deckId: string, path: string) => {
+	const { body } = await request(`https://ankiweb.net/shared/info/${deckId}`)
+	const k: string | undefined = (body?.match(/<input type="hidden" name="k" value="(.*?)">/) ?? [])[1]
 	
-	if (!match)
-		throw new Error('"k" query parameter not found')
+	if (!k) {
+		const error = new Error('"k" query parameter not found')
+		;(error as any).code = 'missing-k-query-parameter'
+		throw error
+	}
 	
-	const response = await fetch(`https://ankiweb.net/shared/downloadDeck/${deckId}?k=${match[1]}`)
-	
-	if (response.headers.get('content-type') === 'application/octet-stream')
-		return response.body
-	
-	throw new Error('The download limit has been reached')
+	return downloadRequest(`https://ankiweb.net/shared/downloadDeck/${deckId}?k=${k}`, path)
 }
