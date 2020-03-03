@@ -9,13 +9,17 @@ const decks: Record<string, {
 	topics: string[]
 }> = require(DECKS_PATH)
 
-export default async (topics: Record<string, string[]> = loadTopics(require(TOPICS_PATH))) => {	
-	for (const [name, topicIds] of Object.entries(topics)) {
+export default async (topics: Record<string, string[]> = loadTopics(require(TOPICS_PATH))) => {
+	const topicEntries = Object.entries(topics)
+	const numberOfTopics = topicEntries.length
+	let i = 0
+	
+	for (const [name, topicIds] of topicEntries) {
 		const { body } = await request(`https://ankiweb.net/shared/decks/${name}`)
 		const match = body?.match(/shared\.files\s=\s(\[.*\]?);/)
 		
 		if (!match) {
-			console.error(`Unable to load decks for topic ${name}`)
+			console.error(`Unable to load decks for topic "${name}" (${++i}/${numberOfTopics})`)
 			continue
 		}
 		
@@ -26,6 +30,8 @@ export default async (topics: Record<string, string[]> = loadTopics(require(TOPI
 			addDeck(deckId, topicIds)
 		
 		delete topics[name]
+		
+		console.log(`Loaded decks for topic "${name}" (${++i}/${numberOfTopics})`)
 	}
 	
 	return topics
