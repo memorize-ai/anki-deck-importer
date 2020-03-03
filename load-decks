@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+
+npm run build || exit 1
+
+node lib/load-decks "$@" --max-old-space-size=24576

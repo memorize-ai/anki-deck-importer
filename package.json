@@ -2,11 +2,6 @@
 	"name": "memorize.ai-anki-deck-importer",
 	"description": "Anki deck importer for memorize.ai",
 	"scripts": {
-		"load-topics": "npm run build && node lib/load-topics --max-old-space-size=24576",
-		"load-decks": "npm run build && node lib/load-decks --max-old-space-size=24576",
-		"download-decks": "npm run build && node lib/download-decks --max-old-space-size=24576",
-		"import-decks": "npm run build && node lib/import-decks --max-old-space-size=24576",
-		
 		"build": "node_modules/.bin/tsc"
 	},
 	"dependencies": {

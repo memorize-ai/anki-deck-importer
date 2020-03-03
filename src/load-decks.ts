@@ -62,5 +62,14 @@ const addDeck = (deckId: string, topicIds: string[]) => {
 	writeFile(DECKS_PATH, JSON.stringify(decks))
 }
 
-if (require.main === module)
-	exports.default().then(console.log).catch(console.error)
+if (require.main === module) {
+	const input = process.argv.length === 3
+		? undefined
+		: process.argv[2]
+	
+	exports.default(input && JSON.parse(input))
+		.then((topics: Record<string, string[]>) =>
+			console.log(JSON.stringify(topics))
+		)
+		.catch(console.error)
+}
